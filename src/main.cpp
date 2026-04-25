@@ -371,11 +371,13 @@ static void display_splash(bool continuous_mode) {
 }
 
 static void display_car_data(const CarData *car, bool continuous_mode) {
+    printf("display_car_data called\n");
     oled_clear();
 
     // Page 0: Reporting mark + car number
     char header[22];
     snprintf(header, sizeof(header), "%s #%s", car->reporting_mark, car->car_number);
+    printf("Header: %s\n", header);
     oled_draw_string(0, 0, header);
     oled_draw_separator(1);
 
@@ -389,8 +391,7 @@ static void display_car_data(const CarData *car, bool continuous_mode) {
     snprintf(wt_line, sizeof(wt_line), "Wt: %s T", car->loaded_weight);
     oled_draw_string(0, 3, wt_line);
 
-    // FIX (Warning 2): Separator moved to page 4 to fill the blank band
-    // that previously appeared between pages 3 and 5.
+    // Separator on page 4
     oled_draw_separator(4);
 
     // Page 5: Current mode
@@ -398,7 +399,9 @@ static void display_car_data(const CarData *car, bool continuous_mode) {
     oled_draw_string(0, 5, mode_str);
     oled_draw_string(0, 6, "Scan complete");
 
+    printf("Calling oled_flush\n");
     oled_flush();
+    printf("oled_flush complete\n");
 }
 
 static void display_error(const char *msg) {
