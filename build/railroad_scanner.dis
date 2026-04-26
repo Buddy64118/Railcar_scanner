@@ -2173,7 +2173,7 @@ Disassembly of section .text:
 100012bc:	2064      	movs	r0, #100	@ 0x64
 100012be:	2100      	movs	r1, #0
 100012c0:	f001 f966 	bl	10002590 <sleep_us>
-100012c4:	2d07      	cmp	r5, #7
+100012c4:	2d0e      	cmp	r5, #14
 100012c6:	d010      	beq.n	100012ea <main+0x482>
 100012c8:	69a3      	ldr	r3, [r4, #24]
 100012ca:	06db      	lsls	r3, r3, #27

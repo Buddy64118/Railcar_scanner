@@ -441,7 +441,7 @@ static void scanner_send_trigger(void) {
     uint8_t ack[7];
     int ack_received = 0;
     uint32_t start = to_ms_since_boot(get_absolute_time());
-    while (ack_received < 7) {
+    while (ack_received < 14) {
         if (uart_is_readable(SCANNER_UART)) {
             ack[ack_received++] = uart_getc(SCANNER_UART);
         }
