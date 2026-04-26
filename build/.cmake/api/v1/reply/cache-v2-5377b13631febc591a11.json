@@ -179,7 +179,7 @@
 			[
 				{
 					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
+					"value" : "Choose the type of build, options are: 'Debug', 'Release', 'MinSizeRel', 'RelWithDebInfo'."
 				},
 				{
 					"name" : "STRINGS",
@@ -187,7 +187,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : "Debug"
+			"value" : "Release"
 		},
 		{
 			"name" : "CMAKE_CACHEFILE_DIR",
@@ -299,10 +299,10 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
+					"value" : "CXX compiler"
 				}
 			],
-			"type" : "FILEPATH",
+			"type" : "STRING",
 			"value" : "/usr/bin/arm-none-eabi-g++"
 		},
 		{
@@ -427,10 +427,10 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
+					"value" : "C compiler"
 				}
 			],
-			"type" : "FILEPATH",
+			"type" : "STRING",
 			"value" : "/usr/bin/arm-none-eabi-gcc"
 		},
 		{
@@ -663,11 +663,11 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
+					"value" : "Enable/Disable output of compile commands during generation."
 				}
 			],
 			"type" : "BOOL",
-			"value" : "TRUE"
+			"value" : ""
 		},
 		{
 			"name" : "CMAKE_EXTRA_GENERATOR",
@@ -1398,22 +1398,6 @@
 			"value" : "[/usr/bin/python3][cfound components: Interpreter ][v3.12.3()]"
 		},
 		{
-			"name" : "GIT_EXECUTABLE",
-			"properties" : 
-			[
-				{
-					"name" : "ADVANCED",
-					"value" : "1"
-				},
-				{
-					"name" : "HELPSTRING",
-					"value" : "Git command line client"
-				}
-			],
-			"type" : "FILEPATH",
-			"value" : "/usr/bin/git"
-		},
-		{
 			"name" : "PICO_32BIT",
 			"properties" : 
 			[
@@ -2060,30 +2044,6 @@
 			],
 			"type" : "STATIC",
 			"value" : "/home/karl/pico-sdk"
-		},
-		{
-			"name" : "picotool_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "The directory containing a CMake configuration file for picotool."
-				}
-			],
-			"type" : "PATH",
-			"value" : "picotool_DIR-NOTFOUND"
-		},
-		{
-			"name" : "picotool_INSTALL_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Directory where picotool has been installed"
-				}
-			],
-			"type" : "PATH",
-			"value" : "/home/karl/Projects/railroad_scanner/build/_deps"
 		},
 		{
 			"name" : "pioasm_DIR",

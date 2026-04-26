@@ -216,8 +216,6 @@ static void oled_flush(void) {
 }
 
 static void oled_init(void) {
-
-    static void oled_init(void) {
     sleep_ms(100);  // Allow OLED power rail to stabilize
     oled_write_cmd(OLED_CMD_DISPLAY_OFF);
     oled_write_cmd(OLED_CMD_SET_DISPLAY_CLK);    oled_write_cmd(0x80);
@@ -437,6 +435,21 @@ static void scanner_send_trigger(void) {
     const uint8_t cmd[] = {0x7E, 0x00, 0x08, 0x01, 0x00, 0x02, 0x01, 0xAB, 0xCD};
     uart_write_blocking(SCANNER_UART, cmd, sizeof(cmd));
     printf("Trigger command sent\n");
+
+    // Wait for and discard the 7-byte acknowledgment response
+    // Response is always: 02 00 00 01 00 33 31
+    uint8_t ack[7];
+    int ack_received = 0;
+    uint32_t start = to_ms_since_boot(get_absolute_time());
+    while (ack_received < 7) {
+        if (uart_is_readable(SCANNER_UART)) {
+            ack[ack_received++] = uart_getc(SCANNER_UART);
+        }
+        if (to_ms_since_boot(get_absolute_time()) - start > 500) break;
+        sleep_us(100);
+    }
+    printf("Acknowledgment received (%d bytes)\n", ack_received);
+    // Barcode data follows after acknowledgment
 }
 
 // FIX (Bug 1): The original scanner_set_continuous() and scanner_set_command()
@@ -476,14 +489,13 @@ static int scanner_readline(char *buf, int max_len, uint32_t timeout_ms) {
     while (idx < max_len - 1) {
         if (uart_is_readable(SCANNER_UART)) {
             char c = uart_getc(SCANNER_UART);
+            printf("byte: 0x%02X\n", (uint8_t)c);
             if (c == '\r' || c == '\n') {
-                if (idx > 0) break;  // End of line — stop reading
-                // else skip leading line endings
+                if (idx > 0) break;
             } else {
                 buf[idx++] = c;
             }
         } else {
-            // Yield briefly — short enough to drain FIFO between bytes at 9600 baud
             sleep_us(100);
         }
         if (to_ms_since_boot(get_absolute_time()) - start > timeout_ms) break;
@@ -613,7 +625,7 @@ int main(void) {
                     while (!gpio_get(SCAN_BUTTON_PIN)) sleep_ms(10);
 
                     // Listen for scanner response — 5 second window
-                    int len = scanner_readline(scan_buf, sizeof(scan_buf), 5000);
+                    int len = scanner_readline(scan_buf, sizeof(scan_buf), 10000);
                     if (len > 0) {
                         if (parse_car_data(scan_buf, &car)) {
                             printf("Car: %s | %s | %s | %.1f T\n",
