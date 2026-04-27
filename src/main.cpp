@@ -369,13 +369,11 @@ static void display_splash(bool continuous_mode) {
 }
 
 static void display_car_data(const CarData *car, bool continuous_mode) {
-    printf("display_car_data called\n");
     oled_clear();
 
     // Page 0: Reporting mark + car number
     char header[22];
     snprintf(header, sizeof(header), "%s #%s", car->reporting_mark, car->car_number);
-    printf("Header: %s\n", header);
     oled_draw_string(0, 0, header);
     oled_draw_separator(1);
 
@@ -397,9 +395,7 @@ static void display_car_data(const CarData *car, bool continuous_mode) {
     oled_draw_string(0, 5, mode_str);
     oled_draw_string(0, 6, "Scan complete");
 
-    printf("Calling oled_flush\n");
     oled_flush();
-    printf("oled_flush complete\n");
 }
 
 static void display_error(const char *msg) {
@@ -436,20 +432,18 @@ static void scanner_send_trigger(void) {
     uart_write_blocking(SCANNER_UART, cmd, sizeof(cmd));
     printf("Trigger command sent\n");
 
-    // Wait for and discard the 7-byte acknowledgment response
-    // Response is always: 02 00 00 01 00 33 31
-    uint8_t ack[7];
+    // Discard the 7-byte acknowledgment: 02 00 00 01 00 33 31
+    uint8_t ack[8];
     int ack_received = 0;
     uint32_t start = to_ms_since_boot(get_absolute_time());
-    while (ack_received < 14) {
+    while (ack_received < 8) {
         if (uart_is_readable(SCANNER_UART)) {
             ack[ack_received++] = uart_getc(SCANNER_UART);
         }
-        if (to_ms_since_boot(get_absolute_time()) - start > 500) break;
+        if (to_ms_since_boot(get_absolute_time()) - start > 2000) break;
         sleep_us(100);
     }
     printf("Acknowledgment received (%d bytes)\n", ack_received);
-    // Barcode data follows after acknowledgment
 }
 
 // FIX (Bug 1): The original scanner_set_continuous() and scanner_set_command()
@@ -489,7 +483,6 @@ static int scanner_readline(char *buf, int max_len, uint32_t timeout_ms) {
     while (idx < max_len - 1) {
         if (uart_is_readable(SCANNER_UART)) {
             char c = uart_getc(SCANNER_UART);
-            printf("byte: 0x%02X\n", (uint8_t)c);
             if (c == '\r' || c == '\n') {
                 if (idx > 0) break;
             } else {

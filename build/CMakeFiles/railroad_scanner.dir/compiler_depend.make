@@ -962,6 +962,7 @@ CMakeFiles/railroad_scanner.dir/home/karl/pico-sdk/lib/tinyusb/src/tusb.c.o: /ho
   /usr/include/newlib/_ansi.h \
   /usr/include/newlib/_newlib_version.h \
   /usr/include/newlib/assert.h \
+  /usr/include/newlib/ctype.h \
   /usr/include/newlib/inttypes.h \
   /usr/include/newlib/machine/_default_types.h \
   /usr/include/newlib/machine/_types.h \
@@ -3623,6 +3624,8 @@ CMakeFiles/railroad_scanner.dir/src/main.cpp.o: /home/karl/Projects/railroad_sca
 
 /home/karl/pico-sdk/src/rp2040/hardware_structs/include/hardware/structs/mpu.h:
 
+/home/karl/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_stack_guard.c:
+
 /home/karl/pico-sdk/src/rp2040/hardware_structs/include/hardware/structs/io_bank0.h:
 
 /home/karl/pico-sdk/src/rp2040/hardware_regs/include/hardware/regs/m0plus.h:
@@ -3721,6 +3724,10 @@ CMakeFiles/railroad_scanner.dir/src/main.cpp.o: /home/karl/Projects/railroad_sca
 
 /home/karl/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c:
 
+/usr/include/newlib/ctype.h:
+
+/home/karl/pico-sdk/src/rp2_common/pico_platform_compiler/include/pico/platform/compiler.h:
+
 /home/karl/pico-sdk/src/rp2_common/hardware_timer/include/hardware/timer.h:
 
 /usr/include/newlib/machine/_types.h:
@@ -3740,8 +3747,6 @@ CMakeFiles/railroad_scanner.dir/src/main.cpp.o: /home/karl/Projects/railroad_sca
 /home/karl/pico-sdk/lib/tinyusb/src/common/tusb_private.h:
 
 /home/karl/pico-sdk/src/rp2040/hardware_structs/include/hardware/structs/vreg_and_chip_reset.h:
-
-/home/karl/pico-sdk/src/rp2_common/pico_platform_compiler/include/pico/platform/compiler.h:
 
 /home/karl/pico-sdk/src/common/pico_sync/include/pico/sem.h:
 
@@ -3802,8 +3807,6 @@ generated/pico_base/pico/version.h:
 /home/karl/pico-sdk/lib/tinyusb/src/device/usbd_pvt.h:
 
 /usr/include/newlib/sys/_sigset.h:
-
-/home/karl/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_stack_guard.c:
 
 /home/karl/pico-sdk/src/common/pico_base_headers/include/pico/assert.h:
 
