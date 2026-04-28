@@ -21,6 +21,7 @@ CMakeFiles/railroad_scanner.dir/src/main.cpp.o: \
  /usr/include/newlib/stdlib.h /usr/include/newlib/machine/stdlib.h \
  /usr/include/newlib/alloca.h \
  /usr/include/newlib/c++/13.2.1/bits/std_abs.h \
+ /usr/include/newlib/ctype.h \
  /home/karl/pico-sdk/src/common/pico_stdlib_headers/include/pico/stdlib.h \
  /home/karl/pico-sdk/src/common/pico_base_headers/include/pico.h \
  /home/karl/pico-sdk/src/common/pico_base_headers/include/pico/types.h \
