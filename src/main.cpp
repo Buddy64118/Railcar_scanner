@@ -271,6 +271,43 @@ static void oled_draw_separator(uint8_t page) {
     }
 }
 
+// Draw a single character at 2x scale (10x14 pixels per character)
+static void oled_draw_char_large(uint8_t x, uint8_t page, char c) {
+    if (c < 32 || c > 127) c = ' ';
+    const uint8_t *glyph = font5x7[c - 32];
+    for (int col = 0; col < 5; col++) {
+        uint8_t col_data = glyph[col];
+        // Expand each bit vertically into two rows (two pages)
+        uint8_t top = 0, bot = 0;
+        for (int bit = 0; bit < 4; bit++) {
+            if (col_data & (1 << bit))       top |= (3 << (bit * 2));
+            if (col_data & (1 << (bit + 4))) bot |= (3 << ((bit - 4) * 2 + 8));
+        }
+        // Write two pixels wide per column
+        for (int dx = 0; dx < 2; dx++) {
+            if (x + col*2 + dx < OLED_WIDTH) {
+                oled_buffer[page       * OLED_WIDTH + x + col*2 + dx] = top;
+                oled_buffer[(page + 1) * OLED_WIDTH + x + col*2 + dx] = bot;
+            }
+        }
+    }
+    // 2-pixel gap between characters
+    for (int dx = 0; dx < 2; dx++) {
+        if (x + 10 + dx < OLED_WIDTH) {
+            oled_buffer[page       * OLED_WIDTH + x + 10 + dx] = 0x00;
+            oled_buffer[(page + 1) * OLED_WIDTH + x + 10 + dx] = 0x00;
+        }
+    }
+}
+
+// Draw a string at 2x scale; each character is 12 pixels wide
+static void oled_draw_string_large(uint8_t x, uint8_t page, const char *str) {
+    while (*str && x < OLED_WIDTH) {
+        oled_draw_char_large(x, page, *str++);
+        x += 12;
+    }
+}
+
 // ====================================================================
 // Car Data Structure
 // ====================================================================
@@ -356,37 +393,33 @@ static bool parse_car_data(const char *raw, CarData *car) {
 
 static void display_splash(void) {
     oled_clear();
-    oled_draw_string(4,  0, "RR CAR SCANNER");
-    oled_draw_separator(1);
-    oled_draw_string(4,  2, "Scan a QR Code");
-    oled_draw_string(4,  3, " to identify");
-    oled_draw_string(4,  4, "  a railcar.");
-    oled_draw_separator(5);
-    oled_draw_string(0,  7, "Press SCAN btn");
+    // Pages 0-1: Title in yellow zone
+    oled_draw_string_large(4, 0, "RR SCALE");
+    // Pages 2-7: Instructions in blue zone
+    oled_draw_separator(2);
+    oled_draw_string(8, 4, "Place car on scale");
+    oled_draw_string(22, 6, "Press SCAN");
     oled_flush();
 }
 
 static void display_car_data(const CarData *car) {
     oled_clear();
 
-    // Page 0: Reporting mark + car number
-    char header[22];
-    snprintf(header, sizeof(header), "%s #%s", car->reporting_mark, car->car_number);
-    oled_draw_string(0, 0, header);
-    oled_draw_separator(1);
+    // Pages 0-1: Reporting mark (YELLOW zone)
+    oled_draw_string_large(0, 0, car->reporting_mark);
 
-    // Page 2: Car type
-    char type_line[22];
-    snprintf(type_line, sizeof(type_line), "Type: %s", car->car_type);
-    oled_draw_string(0, 2, type_line);
+    // Pages 2-3: Car number (BLUE zone)
+    oled_draw_string_large(0, 2, car->car_number);
 
-    // Page 3: Loaded weight
-    char wt_line[22];
-    snprintf(wt_line, sizeof(wt_line), "Wt: %s T", car->loaded_weight);
-    oled_draw_string(0, 3, wt_line);
+    // Pages 4-5: Car type
+    oled_draw_string_large(0, 4, car->car_type);
 
-    oled_draw_separator(4);
-    oled_draw_string(0, 6, "Scan complete");
+    // Pages 6-7: Weight with OK indicator at far right
+    char wt_line[16];
+    snprintf(wt_line, sizeof(wt_line), "%s T", car->loaded_weight);
+    oled_draw_string_large(0, 6, wt_line);
+    oled_draw_string(110, 7, "OK");
+
     oled_flush();
 }
 
@@ -412,11 +445,11 @@ static void scanner_send_trigger(void) {
     uart_write_blocking(SCANNER_UART, cmd, sizeof(cmd));
     printf("Trigger command sent\n");
 
-    // Discard 8 bytes: 7-byte acknowledgment + 1 AIM ID prefix byte
-    uint8_t ack[8];
+    // Discard 7-byte acknowledgment: 02 00 00 01 00 33 31
+uint8_t ack[7];
     int ack_received = 0;
     uint32_t start = to_ms_since_boot(get_absolute_time());
-    while (ack_received < 8) {
+    while (ack_received < 7) {
         if (uart_is_readable(SCANNER_UART)) {
             ack[ack_received++] = uart_getc(SCANNER_UART);
         }
