@@ -17,8 +17,10 @@ pico_sdk_init()
 # ---- Executable ---------------------------------------------
 add_executable(railroad_scanner
     src/main.cpp
+    src/oled.cpp
+    src/scanner.cpp
+    src/car_data.cpp
 )
-
 # ---- Pico SDK Libraries -------------------------------------
 target_link_libraries(railroad_scanner
     pico_stdlib          # GPIO, timing, stdio

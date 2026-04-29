@@ -2023,6 +2023,30 @@ home/karl/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/railroad_scanner.dir/build.make CMakeFiles/railroad_scanner.dir/home/karl/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.s
 .PHONY : home/karl/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.s
 
+src/car_data.o: src/car_data.cpp.o
+.PHONY : src/car_data.o
+
+# target to build an object file
+src/car_data.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/railroad_scanner.dir/build.make CMakeFiles/railroad_scanner.dir/src/car_data.cpp.o
+.PHONY : src/car_data.cpp.o
+
+src/car_data.i: src/car_data.cpp.i
+.PHONY : src/car_data.i
+
+# target to preprocess a source file
+src/car_data.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/railroad_scanner.dir/build.make CMakeFiles/railroad_scanner.dir/src/car_data.cpp.i
+.PHONY : src/car_data.cpp.i
+
+src/car_data.s: src/car_data.cpp.s
+.PHONY : src/car_data.s
+
+# target to generate assembly for a file
+src/car_data.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/railroad_scanner.dir/build.make CMakeFiles/railroad_scanner.dir/src/car_data.cpp.s
+.PHONY : src/car_data.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -2046,6 +2070,54 @@ src/main.s: src/main.cpp.s
 src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/railroad_scanner.dir/build.make CMakeFiles/railroad_scanner.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
+
+src/oled.o: src/oled.cpp.o
+.PHONY : src/oled.o
+
+# target to build an object file
+src/oled.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/railroad_scanner.dir/build.make CMakeFiles/railroad_scanner.dir/src/oled.cpp.o
+.PHONY : src/oled.cpp.o
+
+src/oled.i: src/oled.cpp.i
+.PHONY : src/oled.i
+
+# target to preprocess a source file
+src/oled.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/railroad_scanner.dir/build.make CMakeFiles/railroad_scanner.dir/src/oled.cpp.i
+.PHONY : src/oled.cpp.i
+
+src/oled.s: src/oled.cpp.s
+.PHONY : src/oled.s
+
+# target to generate assembly for a file
+src/oled.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/railroad_scanner.dir/build.make CMakeFiles/railroad_scanner.dir/src/oled.cpp.s
+.PHONY : src/oled.cpp.s
+
+src/scanner.o: src/scanner.cpp.o
+.PHONY : src/scanner.o
+
+# target to build an object file
+src/scanner.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/railroad_scanner.dir/build.make CMakeFiles/railroad_scanner.dir/src/scanner.cpp.o
+.PHONY : src/scanner.cpp.o
+
+src/scanner.i: src/scanner.cpp.i
+.PHONY : src/scanner.i
+
+# target to preprocess a source file
+src/scanner.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/railroad_scanner.dir/build.make CMakeFiles/railroad_scanner.dir/src/scanner.cpp.i
+.PHONY : src/scanner.cpp.i
+
+src/scanner.s: src/scanner.cpp.s
+.PHONY : src/scanner.s
+
+# target to generate assembly for a file
+src/scanner.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/railroad_scanner.dir/build.make CMakeFiles/railroad_scanner.dir/src/scanner.cpp.s
+.PHONY : src/scanner.cpp.s
 
 # Help Target
 help:
@@ -2289,9 +2361,18 @@ help:
 	@echo "... home/karl/pico-sdk/src/rp2_common/pico_unique_id/unique_id.o"
 	@echo "... home/karl/pico-sdk/src/rp2_common/pico_unique_id/unique_id.i"
 	@echo "... home/karl/pico-sdk/src/rp2_common/pico_unique_id/unique_id.s"
+	@echo "... src/car_data.o"
+	@echo "... src/car_data.i"
+	@echo "... src/car_data.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/oled.o"
+	@echo "... src/oled.i"
+	@echo "... src/oled.s"
+	@echo "... src/scanner.o"
+	@echo "... src/scanner.i"
+	@echo "... src/scanner.s"
 .PHONY : help
 
 

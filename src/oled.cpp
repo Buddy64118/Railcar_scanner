@@ -1,0 +1,265 @@
+// ====================================================================
+// oled.cpp — OLED display implementation
+// Hardware: 0.96" SSD1306 OLED, I2C0, GP20 (SDA), GP21 (SCL)
+// ====================================================================
+
+#include "oled.h"
+#include "hardware/i2c.h"
+#include "pico/stdlib.h"
+#include <string.h>
+
+// ---- SSD1306 Commands ---------------------------------------
+#define OLED_CMD_DISPLAY_OFF        0xAE
+#define OLED_CMD_DISPLAY_ON         0xAF
+#define OLED_CMD_SET_CONTRAST       0x81
+// 0xA4 = output follows RAM contents (correct for normal operation)
+// 0xA5 would force ALL pixels on regardless of frame buffer
+#define OLED_CMD_ENTIRE_DISPLAY_ON  0xA4
+#define OLED_CMD_NORMAL_DISPLAY     0xA6
+#define OLED_CMD_SET_MUX_RATIO      0xA8
+#define OLED_CMD_SET_DISPLAY_OFFSET 0xD3
+#define OLED_CMD_SET_DISPLAY_CLK    0xD5
+#define OLED_CMD_SET_PRECHARGE      0xD9
+#define OLED_CMD_SET_COM_PINS       0xDA
+#define OLED_CMD_SET_VCOM_DESELECT  0xDB
+#define OLED_CMD_SET_CHARGE_PUMP    0x8D
+#define OLED_CMD_MEM_ADDR_MODE      0x20
+#define OLED_CMD_SET_COL_ADDR       0x21
+#define OLED_CMD_SET_PAGE_ADDR      0x22
+#define OLED_CMD_SET_START_LINE     0x40
+#define OLED_CMD_SEG_REMAP          0xA1
+#define OLED_CMD_COM_OUT_DIR        0xC8
+
+// ---- Frame Buffer -------------------------------------------
+static uint8_t oled_buffer[OLED_WIDTH * OLED_PAGES];
+
+// ---- 5x7 Font (ASCII 32-127) --------------------------------
+// Each character is 5 bytes wide, 7 pixels tall (1 byte per column)
+static const uint8_t font5x7[][5] = {
+    {0x00,0x00,0x00,0x00,0x00}, // ' ' (32)
+    {0x00,0x00,0x5F,0x00,0x00}, // '!'
+    {0x00,0x07,0x00,0x07,0x00}, // '"'
+    {0x14,0x7F,0x14,0x7F,0x14}, // '#'
+    {0x24,0x2A,0x7F,0x2A,0x12}, // '$'
+    {0x23,0x13,0x08,0x64,0x62}, // '%'
+    {0x36,0x49,0x55,0x22,0x50}, // '&'
+    {0x00,0x05,0x03,0x00,0x00}, // '\''
+    {0x00,0x1C,0x22,0x41,0x00}, // '('
+    {0x00,0x41,0x22,0x1C,0x00}, // ')'
+    {0x14,0x08,0x3E,0x08,0x14}, // '*'
+    {0x08,0x08,0x3E,0x08,0x08}, // '+'
+    {0x00,0x50,0x30,0x00,0x00}, // ','
+    {0x08,0x08,0x08,0x08,0x08}, // '-'
+    {0x00,0x60,0x60,0x00,0x00}, // '.'
+    {0x20,0x10,0x08,0x04,0x02}, // '/'
+    {0x3E,0x51,0x49,0x45,0x3E}, // '0'
+    {0x00,0x42,0x7F,0x40,0x00}, // '1'
+    {0x42,0x61,0x51,0x49,0x46}, // '2'
+    {0x21,0x41,0x45,0x4B,0x31}, // '3'
+    {0x18,0x14,0x12,0x7F,0x10}, // '4'
+    {0x27,0x45,0x45,0x45,0x39}, // '5'
+    {0x3C,0x4A,0x49,0x49,0x30}, // '6'
+    {0x01,0x71,0x09,0x05,0x03}, // '7'
+    {0x36,0x49,0x49,0x49,0x36}, // '8'
+    {0x06,0x49,0x49,0x29,0x1E}, // '9'
+    {0x00,0x36,0x36,0x00,0x00}, // ':'
+    {0x00,0x56,0x36,0x00,0x00}, // ';'
+    {0x08,0x14,0x22,0x41,0x00}, // '<'
+    {0x14,0x14,0x14,0x14,0x14}, // '='
+    {0x00,0x41,0x22,0x14,0x08}, // '>'
+    {0x02,0x01,0x51,0x09,0x06}, // '?'
+    {0x32,0x49,0x79,0x41,0x3E}, // '@'
+    {0x7E,0x11,0x11,0x11,0x7E}, // 'A'
+    {0x7F,0x49,0x49,0x49,0x36}, // 'B'
+    {0x3E,0x41,0x41,0x41,0x22}, // 'C'
+    {0x7F,0x41,0x41,0x22,0x1C}, // 'D'
+    {0x7F,0x49,0x49,0x49,0x41}, // 'E'
+    {0x7F,0x09,0x09,0x09,0x01}, // 'F'
+    {0x3E,0x41,0x49,0x49,0x7A}, // 'G'
+    {0x7F,0x08,0x08,0x08,0x7F}, // 'H'
+    {0x00,0x41,0x7F,0x41,0x00}, // 'I'
+    {0x20,0x40,0x41,0x3F,0x01}, // 'J'
+    {0x7F,0x08,0x14,0x22,0x41}, // 'K'
+    {0x7F,0x40,0x40,0x40,0x40}, // 'L'
+    {0x7F,0x02,0x04,0x02,0x7F}, // 'M'
+    {0x7F,0x04,0x08,0x10,0x7F}, // 'N'
+    {0x3E,0x41,0x41,0x41,0x3E}, // 'O'
+    {0x7F,0x09,0x09,0x09,0x06}, // 'P'
+    {0x3E,0x41,0x51,0x21,0x5E}, // 'Q'
+    {0x7F,0x09,0x19,0x29,0x46}, // 'R'
+    {0x46,0x49,0x49,0x49,0x31}, // 'S'
+    {0x01,0x01,0x7F,0x01,0x01}, // 'T'
+    {0x3F,0x40,0x40,0x40,0x3F}, // 'U'
+    {0x1F,0x20,0x40,0x20,0x1F}, // 'V'
+    {0x3F,0x40,0x38,0x40,0x3F}, // 'W'
+    {0x63,0x14,0x08,0x14,0x63}, // 'X'
+    {0x07,0x08,0x70,0x08,0x07}, // 'Y'
+    {0x61,0x51,0x49,0x45,0x43}, // 'Z'
+    {0x00,0x7F,0x41,0x41,0x00}, // '['
+    {0x02,0x04,0x08,0x10,0x20}, // '\'
+    {0x00,0x41,0x41,0x7F,0x00}, // ']'
+    {0x04,0x02,0x01,0x02,0x04}, // '^'
+    {0x40,0x40,0x40,0x40,0x40}, // '_'
+    {0x00,0x01,0x02,0x04,0x00}, // '`'
+    {0x20,0x54,0x54,0x54,0x78}, // 'a'
+    {0x7F,0x48,0x44,0x44,0x38}, // 'b'
+    {0x38,0x44,0x44,0x44,0x20}, // 'c'
+    {0x38,0x44,0x44,0x48,0x7F}, // 'd'
+    {0x38,0x54,0x54,0x54,0x18}, // 'e'
+    {0x08,0x7E,0x09,0x01,0x02}, // 'f'
+    {0x0C,0x52,0x52,0x52,0x3E}, // 'g'
+    {0x7F,0x08,0x04,0x04,0x78}, // 'h'
+    {0x00,0x44,0x7D,0x40,0x00}, // 'i'
+    {0x20,0x40,0x44,0x3D,0x00}, // 'j'
+    {0x7F,0x10,0x28,0x44,0x00}, // 'k'
+    {0x00,0x41,0x7F,0x40,0x00}, // 'l'
+    {0x7C,0x04,0x18,0x04,0x78}, // 'm'
+    {0x7C,0x08,0x04,0x04,0x78}, // 'n'
+    {0x38,0x44,0x44,0x44,0x38}, // 'o'
+    {0x7C,0x14,0x14,0x14,0x08}, // 'p'
+    {0x08,0x14,0x14,0x18,0x7C}, // 'q'
+    {0x7C,0x08,0x04,0x04,0x08}, // 'r'
+    {0x48,0x54,0x54,0x54,0x20}, // 's'
+    {0x04,0x3F,0x44,0x40,0x20}, // 't'
+    {0x3C,0x40,0x40,0x20,0x7C}, // 'u'
+    {0x1C,0x20,0x40,0x20,0x1C}, // 'v'
+    {0x3C,0x40,0x30,0x40,0x3C}, // 'w'
+    {0x44,0x28,0x10,0x28,0x44}, // 'x'
+    {0x0C,0x50,0x50,0x50,0x3C}, // 'y'
+    {0x44,0x64,0x54,0x4C,0x44}, // 'z'
+    {0x00,0x08,0x36,0x41,0x00}, // '{'
+    {0x00,0x00,0x7F,0x00,0x00}, // '|'
+    {0x00,0x41,0x36,0x08,0x00}, // '}'
+    {0x10,0x08,0x08,0x10,0x08}, // '~'
+    {0x00,0x00,0x00,0x00,0x00}, // DEL
+};
+
+// ====================================================================
+// Low-level I2C write
+// ====================================================================
+static void oled_write_cmd(uint8_t cmd) {
+    uint8_t buf[2] = {0x00, cmd};
+    i2c_write_timeout_us(OLED_I2C, OLED_I2C_ADDR,
+                         buf, 2, false, I2C_CMD_TIMEOUT_US);
+}
+
+// ====================================================================
+// Initialization
+// ====================================================================
+void oled_init(void) {
+    sleep_ms(100);  // Allow OLED power rail to stabilize
+    oled_write_cmd(OLED_CMD_DISPLAY_OFF);
+    oled_write_cmd(OLED_CMD_SET_DISPLAY_CLK);    oled_write_cmd(0x80);
+    oled_write_cmd(OLED_CMD_SET_MUX_RATIO);      oled_write_cmd(0x3F);
+    oled_write_cmd(OLED_CMD_SET_DISPLAY_OFFSET); oled_write_cmd(0x00);
+    oled_write_cmd(OLED_CMD_SET_START_LINE | 0x00);
+    oled_write_cmd(OLED_CMD_SET_CHARGE_PUMP);    oled_write_cmd(0x14);
+    oled_write_cmd(OLED_CMD_MEM_ADDR_MODE);      oled_write_cmd(0x00);
+    oled_write_cmd(OLED_CMD_SEG_REMAP);
+    oled_write_cmd(OLED_CMD_COM_OUT_DIR);
+    oled_write_cmd(OLED_CMD_SET_COM_PINS);       oled_write_cmd(0x12);
+    oled_write_cmd(OLED_CMD_SET_CONTRAST);       oled_write_cmd(OLED_CONTRAST);
+    oled_write_cmd(OLED_CMD_SET_PRECHARGE);      oled_write_cmd(0xF1);
+    oled_write_cmd(OLED_CMD_SET_VCOM_DESELECT);  oled_write_cmd(0x40);
+    oled_write_cmd(OLED_CMD_ENTIRE_DISPLAY_ON);  // 0xA4 = follow RAM
+    oled_write_cmd(OLED_CMD_NORMAL_DISPLAY);
+    oled_write_cmd(OLED_CMD_DISPLAY_ON);
+}
+
+// ====================================================================
+// Frame buffer
+// ====================================================================
+void oled_clear(void) {
+    memset(oled_buffer, 0, sizeof(oled_buffer));
+}
+
+// Batch all address-setup commands into a single I2C transaction
+// instead of separate start/stop pairs for efficiency.
+void oled_flush(void) {
+    uint8_t setup[7];
+    setup[0] = 0x00;
+    setup[1] = OLED_CMD_SET_COL_ADDR;
+    setup[2] = 0;
+    setup[3] = OLED_WIDTH - 1;
+    setup[4] = OLED_CMD_SET_PAGE_ADDR;
+    setup[5] = 0;
+    setup[6] = OLED_PAGES - 1;
+    i2c_write_timeout_us(OLED_I2C, OLED_I2C_ADDR,
+                         setup, sizeof(setup), false, I2C_CMD_TIMEOUT_US);
+
+    for (int page = 0; page < OLED_PAGES; page++) {
+        uint8_t buf[OLED_WIDTH + 1];
+        buf[0] = 0x40;
+        memcpy(&buf[1], &oled_buffer[page * OLED_WIDTH], OLED_WIDTH);
+        i2c_write_timeout_us(OLED_I2C, OLED_I2C_ADDR,
+                             buf, OLED_WIDTH + 1, false, I2C_DATA_TIMEOUT_US);
+    }
+}
+
+// ====================================================================
+// Drawing primitives
+// ====================================================================
+
+// Draw a single character at pixel column x, page row (0-7)
+void oled_draw_char(uint8_t x, uint8_t page, char c) {
+    if (c < 32 || c > 127) c = ' ';
+    const uint8_t *glyph = font5x7[c - 32];
+    for (int col = 0; col < 5; col++) {
+        if (x + col < OLED_WIDTH) {
+            oled_buffer[page * OLED_WIDTH + x + col] = glyph[col];
+        }
+    }
+    if (x + 5 < OLED_WIDTH) {
+        oled_buffer[page * OLED_WIDTH + x + 5] = 0x00;
+    }
+}
+
+// Draw a string; each character is 6 pixels wide (5 glyph + 1 gap)
+void oled_draw_string(uint8_t x, uint8_t page, const char *str) {
+    while (*str && x < OLED_WIDTH) {
+        oled_draw_char(x, page, *str++);
+        x += 6;
+    }
+}
+
+// Draw a single character at 2x scale (10x14 pixels per character)
+void oled_draw_char_large(uint8_t x, uint8_t page, char c) {
+    if (c < 32 || c > 127) c = ' ';
+    const uint8_t *glyph = font5x7[c - 32];
+    for (int col = 0; col < 5; col++) {
+        uint8_t col_data = glyph[col];
+        uint8_t top = 0, bot = 0;
+        for (int bit = 0; bit < 4; bit++) {
+            if (col_data & (1 << bit))       top |= (3 << (bit * 2));
+            if (col_data & (1 << (bit + 4))) bot |= (3 << ((bit - 4) * 2 + 8));
+        }
+        for (int dx = 0; dx < 2; dx++) {
+            if (x + col*2 + dx < OLED_WIDTH) {
+                oled_buffer[page       * OLED_WIDTH + x + col*2 + dx] = top;
+                oled_buffer[(page + 1) * OLED_WIDTH + x + col*2 + dx] = bot;
+            }
+        }
+    }
+    // 2-pixel gap between characters
+    for (int dx = 0; dx < 2; dx++) {
+        if (x + 10 + dx < OLED_WIDTH) {
+            oled_buffer[page       * OLED_WIDTH + x + 10 + dx] = 0x00;
+            oled_buffer[(page + 1) * OLED_WIDTH + x + 10 + dx] = 0x00;
+        }
+    }
+}
+
+// Draw a string at 2x scale; each character is 12 pixels wide
+void oled_draw_string_large(uint8_t x, uint8_t page, const char *str) {
+    while (*str && x < OLED_WIDTH) {
+        oled_draw_char_large(x, page, *str++);
+        x += 12;
+    }
+}
+
+// Draw a solid horizontal separator line across the full display width
+void oled_draw_separator(uint8_t page) {
+    for (int x = 0; x < OLED_WIDTH; x++) {
+        oled_buffer[page * OLED_WIDTH + x] = 0xFF;
+    }
+}

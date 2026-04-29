@@ -10,24 +10,17 @@ CMakeFiles/railroad_scanner.dir/src/main.cpp.o: \
  /usr/include/newlib/sys/reent.h /usr/include/newlib/_ansi.h \
  /usr/include/newlib/sys/_types.h /usr/include/newlib/machine/_types.h \
  /usr/include/newlib/sys/lock.h /usr/include/newlib/sys/stdio.h \
- /usr/include/newlib/string.h /usr/include/newlib/sys/_locale.h \
- /usr/include/newlib/strings.h /usr/include/newlib/sys/string.h \
- /usr/include/newlib/c++/13.2.1/stdlib.h \
- /usr/include/newlib/c++/13.2.1/cstdlib \
- /usr/include/newlib/c++/13.2.1/arm-none-eabi/thumb/v6-m/nofp/bits/c++config.h \
- /usr/include/newlib/c++/13.2.1/arm-none-eabi/thumb/v6-m/nofp/bits/os_defines.h \
- /usr/include/newlib/c++/13.2.1/arm-none-eabi/thumb/v6-m/nofp/bits/cpu_defines.h \
- /usr/include/newlib/c++/13.2.1/pstl/pstl_config.h \
- /usr/include/newlib/stdlib.h /usr/include/newlib/machine/stdlib.h \
- /usr/include/newlib/alloca.h \
- /usr/include/newlib/c++/13.2.1/bits/std_abs.h \
- /usr/include/newlib/ctype.h \
  /home/karl/pico-sdk/src/common/pico_stdlib_headers/include/pico/stdlib.h \
  /home/karl/pico-sdk/src/common/pico_base_headers/include/pico.h \
  /home/karl/pico-sdk/src/common/pico_base_headers/include/pico/types.h \
  /home/karl/pico-sdk/src/common/pico_base_headers/include/pico/assert.h \
  /usr/lib/gcc/arm-none-eabi/13.2.1/include/stdbool.h \
- /usr/include/newlib/c++/13.2.1/cassert /usr/include/newlib/assert.h \
+ /usr/include/newlib/c++/13.2.1/cassert \
+ /usr/include/newlib/c++/13.2.1/arm-none-eabi/thumb/v6-m/nofp/bits/c++config.h \
+ /usr/include/newlib/c++/13.2.1/arm-none-eabi/thumb/v6-m/nofp/bits/os_defines.h \
+ /usr/include/newlib/c++/13.2.1/arm-none-eabi/thumb/v6-m/nofp/bits/cpu_defines.h \
+ /usr/include/newlib/c++/13.2.1/pstl/pstl_config.h \
+ /usr/include/newlib/assert.h \
  /usr/lib/gcc/arm-none-eabi/13.2.1/include/stdint.h \
  /home/karl/Projects/railroad_scanner/build/generated/pico_base/pico/version.h \
  /home/karl/pico-sdk/src/common/pico_base_headers/include/pico/config.h \
@@ -74,4 +67,7 @@ CMakeFiles/railroad_scanner.dir/src/main.cpp.o: \
  /home/karl/pico-sdk/src/rp2_common/pico_stdio_usb/include/pico/stdio_usb.h \
  /home/karl/pico-sdk/src/rp2_common/hardware_i2c/include/hardware/i2c.h \
  /home/karl/pico-sdk/src/rp2040/hardware_structs/include/hardware/structs/i2c.h \
- /home/karl/pico-sdk/src/rp2040/hardware_regs/include/hardware/regs/i2c.h
+ /home/karl/pico-sdk/src/rp2040/hardware_regs/include/hardware/regs/i2c.h \
+ /home/karl/Projects/railroad_scanner/src/oled.h \
+ /home/karl/Projects/railroad_scanner/src/scanner.h \
+ /home/karl/Projects/railroad_scanner/src/car_data.h

@@ -24,7 +24,7 @@ set(CMAKE_ASM_COMPILER_ID "GNU")
 
 # Preprocessor definitions for this target.
 set(CMAKE_TARGET_DEFINITIONS_ASM
-  "CFG_TUSB_DEBUG=1"
+  "CFG_TUSB_DEBUG=0"
   "CFG_TUSB_MCU=OPT_MCU_RP2040"
   "CFG_TUSB_OS=OPT_OS_PICO"
   "LIB_BOOT_STAGE2_HEADERS=1"
@@ -74,7 +74,7 @@ set(CMAKE_TARGET_DEFINITIONS_ASM
   "PICO_32BIT=1"
   "PICO_BOARD=\"pico_w\""
   "PICO_BUILD=1"
-  "PICO_CMAKE_BUILD_TYPE=\"Debug\""
+  "PICO_CMAKE_BUILD_TYPE=\"Release\""
   "PICO_COPY_TO_RAM=0"
   "PICO_CXX_ENABLE_EXCEPTIONS=0"
   "PICO_NO_FLASH=0"
@@ -224,7 +224,10 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/karl/pico-sdk/src/rp2_common/pico_stdlib/stdlib.c" "CMakeFiles/railroad_scanner.dir/home/karl/pico-sdk/src/rp2_common/pico_stdlib/stdlib.c.o" "gcc" "CMakeFiles/railroad_scanner.dir/home/karl/pico-sdk/src/rp2_common/pico_stdlib/stdlib.c.o.d"
   "/home/karl/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c" "CMakeFiles/railroad_scanner.dir/home/karl/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.o" "gcc" "CMakeFiles/railroad_scanner.dir/home/karl/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.o.d"
   "/home/karl/pico-sdk/src/rp2_common/pico_cxx_options/new_delete.cpp" "CMakeFiles/railroad_scanner.dir/home/karl/pico-sdk/src/rp2_common/pico_cxx_options/new_delete.cpp.o" "gcc" "CMakeFiles/railroad_scanner.dir/home/karl/pico-sdk/src/rp2_common/pico_cxx_options/new_delete.cpp.o.d"
+  "/home/karl/Projects/railroad_scanner/src/car_data.cpp" "CMakeFiles/railroad_scanner.dir/src/car_data.cpp.o" "gcc" "CMakeFiles/railroad_scanner.dir/src/car_data.cpp.o.d"
   "/home/karl/Projects/railroad_scanner/src/main.cpp" "CMakeFiles/railroad_scanner.dir/src/main.cpp.o" "gcc" "CMakeFiles/railroad_scanner.dir/src/main.cpp.o.d"
+  "/home/karl/Projects/railroad_scanner/src/oled.cpp" "CMakeFiles/railroad_scanner.dir/src/oled.cpp.o" "gcc" "CMakeFiles/railroad_scanner.dir/src/oled.cpp.o.d"
+  "/home/karl/Projects/railroad_scanner/src/scanner.cpp" "CMakeFiles/railroad_scanner.dir/src/scanner.cpp.o" "gcc" "CMakeFiles/railroad_scanner.dir/src/scanner.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

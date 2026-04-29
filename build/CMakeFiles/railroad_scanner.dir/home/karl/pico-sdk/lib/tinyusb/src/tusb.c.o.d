@@ -72,5 +72,4 @@ CMakeFiles/railroad_scanner.dir/home/karl/pico-sdk/lib/tinyusb/src/tusb.c.o: \
  /home/karl/pico-sdk/lib/tinyusb/src/class/vendor/vendor_device.h \
  /home/karl/pico-sdk/lib/tinyusb/src/common/tusb_private.h \
  /home/karl/pico-sdk/lib/tinyusb/src/device/usbd_pvt.h \
- /home/karl/pico-sdk/lib/tinyusb/src/common/tusb_private.h \
- /usr/include/newlib/ctype.h
+ /home/karl/pico-sdk/lib/tinyusb/src/common/tusb_private.h
